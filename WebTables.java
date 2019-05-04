@@ -18,42 +18,58 @@ public class WebTables {
 		driver = new ChromeDriver();
 		driver.get("https://www.w3schools.com/html/html_tables.asp");
 
+		ArrayList<ArrayList<String>> Table = new ArrayList<ArrayList<String>>();
 		List <WebElement> rows = driver.findElements(By.xpath("//table[@id='customers']//tr"));
-		int size = rows.size();
-		String FP="//*[@id='customers']/tbody/tr[";
-		String SP = "]/td[";
-		String TP= "]";
-		
-		int colnum=2;
-		ArrayList<String> ar=GetColumnDataList(FP, SP,TP,size,colnum);
-		System.out.println(ar);
-		
-		HashMap<Integer,String> map = GetColumnDataMap(FP, SP,TP,size,colnum);
-		System.out.println(map);
-		
+		List <WebElement> cols = driver.findElements(By.xpath("//table[@id='customers']//tr//th"));
+		int row_size = rows.size();
+		int col_size = cols.size();
+
+		String XP_BeforeR_="//*[@id='customers']/tbody/tr[";
+		String XP_Betwn = "]/td[";
+		String XP_AfterC= "]";
+
+
+		for (int i = 1; i<=col_size; i++){
+			ArrayList<String> Col_data = new ArrayList<String>();
+			Col_data = GetColumnDataList(XP_BeforeR_, XP_Betwn,XP_AfterC,row_size,i);
+			Table.add(Col_data);
+		}
+		printColumnTable(Table);
+
 		driver.quit();
-		
+
 	}
-	
+
 	public static HashMap<Integer,String> GetColumnDataMap(String FP, String SP,String TP, int size, int colnum) {
 		HashMap<Integer, String> map = new HashMap<Integer, String>();
-		for(int i =2; i<=size; i++){
+		for(int i =1; i<=size; i++){
 			String XP = FP + i + SP + colnum + TP;
 
 			map.put(i-1,driver.findElement(By.xpath(XP)).getText());
 		}
 		return map;
 	}
-	
+
 	public static ArrayList<String> GetColumnDataList(String FP, String SP,String TP, int size, int colnum) {
-		//*[@id="customers"]/tbody/tr[2]/td[1]
 		ArrayList<String> ar= new ArrayList<String>();
 		for(int i =2; i<=size; i++){
 			String XP = FP + i + SP + colnum + TP;
-			
+
 			ar.add(driver.findElement(By.xpath(XP)).getText());
 		}
 		return ar;
+	}
+	
+	public static void printColumnTable(ArrayList<ArrayList<String>> Table){
+		int col_num = Table.size();
+		int row_num = Table.get(1).size();
+
+		for(int i=0; i<row_num; i++){
+			for(int j=0; j<col_num; j++){
+				System.out.format("%-32s",Table.get(j).get(i));
+			}
+			System.out.println();
+		}
 	}
 
 }
